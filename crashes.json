@@ -1,0 +1,23 @@
+[
+    {
+        "place": "YUMA AZ",
+        "lat": "32.656389",
+        "lon": "-114.605833",
+        "date": "2007-11-23",
+        "passengers": {"total": "100", "dead":"100", "survivers":"0"}
+    },
+    {
+        "place": "YELM WA",
+        "lat": "46.926945",
+        "lon": "-122.465556",
+        "date": "2007-11-23",
+        "passengers": {"total": "200", "dead":"1", "survivers":"199"}
+    },
+    {
+        "place": "Mesquite TX",
+        "lat": "32.760556",
+        "lon": "-96.534166",
+        "date": "2007-11-23",
+        "passengers": {"total": "200", "dead":"0", "survivers":"200"}
+    }
+]
