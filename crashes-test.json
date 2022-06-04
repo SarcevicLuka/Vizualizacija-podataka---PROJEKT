@@ -1,0 +1,26 @@
+[
+    {
+        "date": "20.6.2004",
+        "place": "GULF SHORES, AL",
+        "lat": "30.290277",
+        "lon": "-87.671667",
+		"airport": "Norton Field",
+		"aircraftDamage": "Substantial",
+		"purposeOfFlight": "Other Work Use",
+        "passengers": {"total": "1", "dead":"0", "survivers":"1"}
+    },
+    {
+        "place": "YELM WA",
+        "lat": "46.926945",
+        "lon": "-122.465556",
+        "date": "23.11.2007",
+        "passengers": {"total": "200", "dead":"1", "survivers":"199"}
+    },
+    {
+        "place": "Mesquite TX",
+        "lat": "32.760556",
+        "lon": "-96.534166",
+        "date": "23.11.2007",
+        "passengers": {"total": "200", "dead":"0", "survivers":"200"}
+    }
+]

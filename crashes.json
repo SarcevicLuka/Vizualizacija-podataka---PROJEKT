@@ -1,23 +1,43 @@
 [
     {
-        "place": "YUMA AZ",
-        "lat": "32.656389",
-        "lon": "-114.605833",
-        "date": "2007-11-23",
-        "passengers": {"total": "100", "dead":"100", "survivers":"0"}
+        "date": "20.6.2004",
+        "place": "GULF SHORES, AL",
+        "lat": "30.290277",
+        "lon": "-87.671667",
+		"airport": "Norton Field",
+		"aircraftDamage": "Substantial",
+		"purposeOfFlight": "Other Work Use",
+        "passengers": {"total": "1", "dead":"0", "survivers":"1"}
     },
-    {
-        "place": "YELM WA",
-        "lat": "46.926945",
-        "lon": "-122.465556",
-        "date": "2007-11-23",
-        "passengers": {"total": "200", "dead":"1", "survivers":"199"}
+	{
+        "date": "20.7.2002",
+        "place": "ENTERPRISE, AL",
+        "lat": "31.283333",
+        "lon": "-85.893055",
+		"airport": "Enterprise Municipal Airport",
+		"aircraftDamage": "Substantial",
+		"purposeOfFlight": "Instructional",
+        "passengers": {"total": "2", "dead":"0", "survivers":"2"}
     },
-    {
-        "place": "Mesquite TX",
-        "lat": "32.760556",
-        "lon": "-96.534166",
-        "date": "2007-11-23",
-        "passengers": {"total": "200", "dead":"0", "survivers":"200"}
+	{
+        "date": "15.6.2005",
+        "place": "ANCHORAGE, AK",
+        "lat": "53.08",
+        "lon": "-144.231667",
+		"airport": "Unknown",
+		"aircraftDamage": "Substantial",
+		"purposeOfFlight": "Instructional",
+        "passengers": {"total": "5", "dead":"2", "survivers":"3"}
+    }
+    ,
+	{
+        "date": "19.6.2002",
+        "place": "KETCHIKAN, AK",
+        "lat": "55.35",
+        "lon": "-131.676667",
+		"airport": "Ketchikan Water Front",
+		"aircraftDamage": "Substantial",
+		"purposeOfFlight": "Unknown",
+        "passengers": {"total": "31", "dead":"0", "survivers":"31"}
     }
 ]
