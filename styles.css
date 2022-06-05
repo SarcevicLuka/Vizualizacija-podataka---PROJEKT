@@ -1,0 +1,86 @@
+path:hover {
+    fill-opacity: .7;
+}
+
+div.tooltip {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    width: 200px;
+    height: 15px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: white;
+    border: 0px;
+    border-radius: 8px;
+}
+
+body {
+    font: 15px sans-serif;
+}
+
+.map {
+    float: left;
+    overflow: hidden;
+    max-width: 60%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-left: 40px;
+}
+
+.item {
+    display: inline-block;
+    height: 500px;
+}
+
+.crash-information {
+    margin-right: 40px;
+    max-width: 40%;
+    float: right;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.text-information {
+    text-align: center;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.crashPoint:hover {
+    opacity: 1.0;
+}
+
+.dot {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 30px;
+}
+
+.redDot {
+    background-color: rgb(217,91,67);
+}
+
+.blackDot {
+    background-color: rgb(0,0,0);
+}
+
+.legend {
+    display: flex;
+    padding: 5px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.legend-text {
+    padding-left: 5px;
+}
+
+.legend  {
+    padding-left: 10px;
+}

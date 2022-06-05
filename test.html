@@ -4,65 +4,18 @@
 <head>
     <meta charset="utf-8">
     <script src="https://d3js.org/d3.v3.min.js"></script>
-    <style type="text/css">
-        path:hover {
-            fill-opacity: .7;
-        }
-
-        div.tooltip {
-            position: absolute;
-            display: flex;
-            justify-content: center;
-            text-align: center;
-            width: 200px;
-            height: 15px;
-            padding: 2px;
-            font: 12px sans-serif;
-            background: white;
-            border: 0px;
-            border-radius: 8px;
-        }
-
-        body {
-            font: 15px sans-serif;
-        }
-
-        .map {
-            float: left;
-            overflow: hidden;
-            max-width: 750px;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        }
-
-        .item {
-            display: inline-block;
-            height: 500px;
-            margin: 30px
-        }
-
-        .crash-information {
-            float: right;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        }
-
-        .text-information {
-            text-align: center;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        .crashPoint:hover {
-            opacity: 1.0;
-        }
-    </style>
+    <link rel="stylesheet" href="./styles.css">
 </head>
 
 <body>
     <h1>Plane crashes in the USA from 2000 to 2020</h1>
     <div class="container">
-        <div class="map item"></div>
+        <div class="map item">
+            <div class="legend">
+                <span class="redDot dot"></span><span class="legend-text">All passengers survived</span>
+                <span class="blackDot dot"></span><span class="legend-text">At least one death</span>
+            </div>
+        </div>
         <div class="crash-information item">
             <div class="text-information"></div>
         </div>
@@ -78,11 +31,10 @@
         var outerRadius = 80;
         var donutHeight = 300;
         var donutWidth = 500;
-
         var firstClick = false;
         var dead = 0;
         var currentRadius = 0;
-        
+
         var color = d3.scale.linear()
             .range(["rgb(213,222,217)", "rgb(69,173,168)", "rgb(84,36,55)", "rgb(217,91,67)"]);
 
@@ -95,7 +47,6 @@
 
         var divTooltip;
 
-
         var svg = d3.select(".map")
             .append("svg")
             .attr("width", width)
@@ -105,8 +56,7 @@
             }))
             .append("g");
 
-        d3.json("us-states.json", function (json) {
-
+        function loadMapFeatures(json) {
             svg.selectAll("path")
                 .data(json.features)
                 .enter()
@@ -115,167 +65,204 @@
                 .style("stroke", "#fff")
                 .style("stroke-width", "1")
                 .style("fill", "#BBB0B0");
-                
+        }
+
+        function createTooltip(d) {
+            divTooltip = d3.select("body")
+                .append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
+
+            divTooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+
+            divTooltip.text(d.place + ", " + d.date)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        }
+
+        function createTextInfo(d) {
+            var informacije = d3.select(".text-information")
+                .html(
+                    "<p>Date of accident: " + "<span>" + d.date + "<span/>" + "<p/>" +
+                    "<p>Place of accident: " + "<span>" + d.place + "<span/>" + "<p/>" +
+                    "<p>Airport where plane took of: " + "<span>" + d.airport + "<span/>" + "<p/>" +
+                    "<p>Aircraft damage: " + "<span>" + d.aircraftDamage + "<span/>" + "<p/>" +
+                    "<p>Purpose of flight: " + "<span>" + d.purposeOfFlight + "<span/>" + "<p/>" +
+                    "<hr>" +
+                    "Passenger information:"
+                );
+        }
+
+        function createDonutGraph(d) {
+            var donutInfo = d3.select(".crash-information");
+            var donutSVG = d3.select(".crash-information svg");
+
+            if (firstClick == false) {
+                var infoSVG = donutInfo
+                    .append("svg")
+                    .attr("class", "crash-info-svg")
+                    .attr("width", donutWidth)
+                    .attr("height", donutHeight);
+                firstClick = true;
+            }
+            else if (firstClick == true) {
+                donutSVG
+                    .remove();
+                infoSVG = donutInfo
+                    .append("svg")
+                    .attr("width", donutWidth)
+                    .attr("height", donutHeight);
+            }
+
+            var color = d3.scale.category20();
+
+            var arc = d3.svg.arc()
+                .innerRadius(innerRadius)
+                .outerRadius(outerRadius);
+            var pie = d3.layout.pie()
+                .value(function (d) { return d[0] });
+            var pieArcs = infoSVG.selectAll("g.pie")
+                .data(pie([[d.dead, "dead"], [d.survived, "survived"]]))
+                .enter()
+                .append("g")
+                .attr("class", "pie")
+                .attr("transform", "translate(" + (donutWidth / 2) + ", " + (donutHeight / 2) + ")");
+
+
+            totalDead = 0;
+            pieArcs.append("path")
+                .attr("fill", function (d, i) {
+                    totalDead += d.value;
+                    return color(i);
+                })
+                .attr("d", arc);
+
+            pieArcs.append("text")
+                .attr("text-anchor", "middle")
+                .attr('font-size', '13px')
+                .attr('y', 8)
+                .text("Total:" + totalDead);
+
+            var labelArc = d3.svg.arc()
+                .outerRadius(outerRadius + 20)
+                .innerRadius(outerRadius - 5);
+
+            pieArcs.append("text")
+                .attr("transform", function (d) {
+                    return "translate(" + arc.centroid(d) + ")";
+                })
+                .attr("text-anchor", "middle")
+                .text(function (d) {
+                    var output = "";
+                    var i = 0;
+                    if (d.data[1] == "dead") {
+                        output = "Dead: " + d.value;
+                    }
+                    else {
+                        output = "Survived: " + d.value;
+                    }
+                    return output;
+                })
+                .attr("transform", function (d) {
+                    var midAngle = d.startAngle / 2 + d.endAngle / 2 < Math.PI ? d.startAngle / 2 + d.endAngle / 2 : d.startAngle / 2 + d.endAngle / 2 + Math.PI;
+                    return "translate(" + labelArc.centroid(d)[0] * 1.4 + "," + labelArc.centroid(d)[1] * 1.4 + ") rotate(0)";
+                });
+        }
+
+        function createCrashPoints(data) {
+            svg.selectAll("circle")
+                .data(data)
+                .enter()
+                .append("circle")
+                .attr("class", function (d) {
+                    if (d.dead == 0) {
+                        return "redCircle";
+                    }
+                    else if (d.dead > 0) {
+                        return "blackCircle";
+                    }
+                })
+                .attr("cx", function (d) {
+                    try {
+                        return projection([d.lon, d.lat])[0];
+                    } catch (error) {
+                        return;
+                    }
+                })
+                .attr("cy", function (d) {
+                    try {
+                        return projection([d.lon, d.lat])[1];
+                    } catch (error) {
+                        return;
+                    }
+                })
+                .attr("r", function (d) {
+                    try {
+                        if (d.survived == 0) {
+                            currentRadius = Math.sqrt(d.dead);
+                            return currentRadius;
+                        }
+                        else if (d.dead == 0) {
+                            currentRadius = Math.sqrt(d.survived) * 0.5;
+                            return currentRadius;
+                        }
+                    } catch (error) {
+                        return;
+                    }
+                })
+                .style("fill", function (d) {
+                    if (d.dead > 0) {
+                        return "rgb(0,0,0)";
+                    }
+                    else {
+                        return "rgb(217,91,67)";
+                    }
+                })
+                .style("opacity", 0.3)
+                .on("mouseover", function (d) {
+
+                    d3.select(this).transition()
+                        .duration(200)
+                        .style("fill", "rgb(255,255,255)")
+                        .style("opacity", 1);
+
+                    createTooltip(d);
+                })
+                .on("mouseout", function () {
+                    d3.select(this).transition()
+                        .duration(200)
+                        .style("fill", function () {
+                            if (d3.select(this).attr("class") == "blackCircle") {
+                                return "rgb(0,0,0)";
+                            }
+                            else if (d3.select(this).attr("class") == "redCircle") {
+                                return "rgb(217,91,67)";
+                            }
+                        })
+                        .style("opacity", 0.3);
+
+                    divTooltip.transition()
+                        .duration(500)
+                        .style("opacity", 0)
+                        .remove();
+                })
+                .on("click", function (d) {
+                    
+                    createTextInfo(d);
+                    createDonutGraph(d);
+                });
+        }
+
+        d3.json("us-states.json", function (json) {
+
+            loadMapFeatures(json);
+
             d3.json("crashes-excel.json", function (data) {
-                svg.selectAll("circle")
-                    .data(data)
-                    .enter()
-                    .append("circle")
-                    .attr("cx", function (d) {
-                        try {
-                            if(d.place=="MOUNTAIN HOME, ID"){
-                                console.log("MOUNTAIN HOME x:" + projection([d.lon, d.lat])[0]);
-                            }
-                            if(d.place=="Whick, KY"){
-                                console.log("Whick, KY x:" + projection([d.lon, d.lat])[0]);
-                            }
-                            return projection([d.lon, d.lat])[0];
-                        } catch (error) {
-                            return;
-                        }
-                    })
-                    .attr("cy", function (d) {
-                        try {
-                            if(d.place=="MOUNTAIN HOME, ID"){
-                                console.log("MOUNTAIN HOME y:" + projection([d.lon, d.lat])[1]);
-                            }
-                            if(d.place=="Whick, KY"){
-                                console.log("Whick, KY y:" + projection([d.lon, d.lat])[1]);
-                            }
-                            return projection([d.lon, d.lat])[1];
-                        } catch (error) {
-                            return;
-                        }
-                    })
-                    .attr("r", function (d) {
 
-                        try {
-                            if (d.totalFatalInjuries == 0) {
-                                currentRadius = Math.sqrt(7);
-                                return currentRadius;
-                            }
-                            else {
-                                currentRadius = Math.sqrt(d.totalFatalInjuries) * 0.5;
-                                return currentRadius;
-                            }
-                        } catch (error) {
-                            return;
-                        }
-                    })
-                    .style("fill", "rgb(217,91,67)")
-                    .style("opacity", 0.3)
-                    .on("mouseover", function (d) {
-                        d3.select(this).transition()
-                            .duration(200)
-                            .style("fill", "rgb(255,255,255)")
-                            .style("opacity", 1);
+                createCrashPoints(data);
 
-                        divTooltip = d3.select("body")
-                            .append("div")
-                            .attr("class", "tooltip")
-                            .style("opacity", 0);
-                        divTooltip.transition()
-                            .duration(200)
-                            .style("opacity", .9);
-                        divTooltip.text(d.place + ", " + d.date)
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
-                    })
-                    .on("mouseout", function (d) {
-                        d3.select(this).transition()
-                            .duration(200)
-                            .style("fill", "rgb(217,91,67)")
-                            .style("opacity", 0.3);
-
-                        divTooltip.transition()
-                            .duration(500)
-                            .style("opacity", 0)
-                            .remove();
-                    })
-                    .on("click", function (d) {
-                        var counter = 0;
-                        var informacije = d3.select(".text-information")
-                            .html(
-                                "<p>Date of accident: " + "<span>" + d.date + "<span/>" + "<p/>" +
-                                "<p>Place of accident: " + "<span>" + d.place + "<span/>" + "<p/>" +
-                                "<p>Airport where plane took of: " + "<span>" + d.airport + "<span/>" + "<p/>" +
-                                "<p>Aircraft damage: " + "<span>" + d.aircraftDamage + "<span/>" + "<p/>" +
-                                "<p>Purpose of flight: " + "<span>" + d.purposeOfFlight + "<span/>" + "<p/>" +
-                                "<hr>" +
-                                "Passenger information:"
-                            );
-
-                        var donutInfo = d3.select(".crash-information");
-                        var donutSVG = d3.select(".crash-information svg");
-
-                        if (firstClick == false) {
-                            var infoSVG = donutInfo
-                                .append("svg")
-                                .attr("class", "crash-info-svg")
-                                .attr("width", donutWidth)
-                                .attr("height", donutHeight);
-                            firstClick = true;
-                        }
-                        else if (firstClick == true) {
-                            donutSVG
-                                .remove();
-                            infoSVG = donutInfo
-                                .append("svg")
-                                .attr("width", donutWidth)
-                                .attr("height", donutHeight);
-                        }
-
-                        var color = d3.scale.category20();
-
-                        var arc = d3.svg.arc()
-                            .innerRadius(innerRadius)
-                            .outerRadius(outerRadius);
-                        var pie = d3.layout.pie()
-                            .value(function (d) { return d[0] });
-                        var pieArcs = infoSVG.selectAll("g.pie")
-                            .data(pie([[d.totalFatalInjuries, "dead"], [d.totalUninjured, "serious"]]))
-                            .enter()
-                            .append("g")
-                            .attr("class", "pie")
-                            .attr("transform", "translate(" + (donutWidth / 2) + ", " + (donutHeight / 2) + ")");
-
-
-                        totalDead = 0;
-                        pieArcs.append("path")
-                            .attr("fill", function (d, i) {
-                                totalDead += d.value;
-                                return color(i);
-                            })
-                            .attr("d", arc);
-                        pieArcs.append("text")
-                            .attr("text-anchor", "middle")
-                            .attr('font-size', '13px')
-                            .attr('y', 8)
-                            .text("Total:" + totalDead);
-                        var labelArc = d3.svg.arc()
-                            .outerRadius(outerRadius + 20)
-                            .innerRadius(outerRadius - 5);
-                        pieArcs.append("text")
-                            .attr("transform", function (d) {
-                                return "translate(" + arc.centroid(d) + ")";
-                            })
-                            .attr("text-anchor", "middle")
-                            .text(function (d) {
-                                var output = "";
-                                var i = 0;
-                                if (d.data[1] == "dead") {
-                                    output = "Dead: " + d.value;
-                                }
-                                else {
-                                    output = "Survived: " + d.value;
-                                }
-                                return output;
-                            })
-                            .attr("transform", function (d) {
-                                var midAngle = d.startAngle / 2 + d.endAngle / 2 < Math.PI ? d.startAngle / 2 + d.endAngle / 2 : d.startAngle / 2 + d.endAngle / 2 + Math.PI;
-                                return "translate(" + labelArc.centroid(d)[0] * 1.4 + "," + labelArc.centroid(d)[1] * 1.4 + ") rotate(0)";
-                            });
-                    });
             });
 
         });
