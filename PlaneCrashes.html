@@ -19,7 +19,7 @@
 </head>
 
 <body>
-    <h1>Plane crashes in the USA from 2000 to 2020</h1>
+    <h1>Plane crashes in the USA from 2000 to 2022</h1>
     <!-- https://dev.to/dawnind/3-ways-to-display-two-divs-side-by-side-3d8b -->
     <div class="container">
         <div class="map item">
@@ -113,10 +113,10 @@
                 .attr("transform", "translate(" + (donutWidth / 2) + ", " + (donutHeight / 2) + ")");
 
 
-            totalDead = 0;
+            totalPassengers = 0;
             pieArcs.append("path")
                 .attr("fill", function (d, i) {
-                    totalDead += d.value;
+                    totalPassengers += d.value;
                     return color(i);
                 })
                 .attr("d", arc);
@@ -125,7 +125,7 @@
                 .attr("text-anchor", "middle")
                 .attr('font-size', '13px')
                 .attr('y', 8)
-                .text("Total:" + totalDead);
+                .text("Total:" + totalPassengers);
 
             var labelArc = d3.svg.arc()
                 .outerRadius(outerRadius + 20)
@@ -148,8 +148,11 @@
                     return output;
                 })
                 .attr("transform", function (d) {
-                    var midAngle = d.startAngle / 2 + d.endAngle / 2 < Math.PI ? d.startAngle / 2 + d.endAngle / 2 : d.startAngle / 2 + d.endAngle / 2 + Math.PI;
-                    return "translate(" + labelArc.centroid(d)[0] * 1.4 + "," + labelArc.centroid(d)[1] * 1.4 + ") rotate(0)";
+                    var midAngle = d.startAngle / 2 + d.endAngle / 2 < Math.PI ? d.startAngle / 
+                    2 + d.endAngle / 2 : d.startAngle / 2 + d.endAngle / 2 + Math.PI;
+
+                    return "translate(" + labelArc.centroid(d)[0] * 1.4 + "," + 
+                    labelArc.centroid(d)[1] * 1.4 + ") rotate(0)";
                 });
         }
 
@@ -247,7 +250,7 @@
         
         var width = 750;
         var height = 500;
-        var totalDead = 0;
+        var totalPassengers = 0;
         var innerRadius = 50;
         var outerRadius = 80;
         var donutHeight = 300;
