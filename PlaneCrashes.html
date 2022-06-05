@@ -1,3 +1,14 @@
+<!-- Način korištenja:
+
+        1. Skinuti XAMPP
+        2. Pokrenuti XAMPP control panel te kliknuti "Start" na Apache servis
+        3. Mapu prebaciti u XAMPP htdocs folder
+        4. U tražilicu upisati http://localhost/KV-Viz_sarcevic/PlaneCrashes.html
+        5. Stranica će se učitati i možete korstiti vizualizaciju
+-->
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,9 +20,11 @@
 
 <body>
     <h1>Plane crashes in the USA from 2000 to 2020</h1>
+    <!-- https://dev.to/dawnind/3-ways-to-display-two-divs-side-by-side-3d8b -->
     <div class="container">
         <div class="map item">
             <div class="legend">
+                <!-- https://www.w3schools.com/howto/howto_css_circles.asp -->
                 <span class="redDot dot"></span><span class="legend-text">All passengers survived</span>
                 <span class="blackDot dot"></span><span class="legend-text">At least one death</span>
             </div>
@@ -24,38 +37,6 @@
 
     <script type="text/javascript">
 
-        var width = 750;
-        var height = 500;
-        var totalDead = 0;
-        var innerRadius = 50;
-        var outerRadius = 80;
-        var donutHeight = 300;
-        var donutWidth = 500;
-        var firstClick = false;
-        var dead = 0;
-        var currentRadius = 0;
-
-        var color = d3.scale.linear()
-            .range(["rgb(213,222,217)", "rgb(69,173,168)", "rgb(84,36,55)", "rgb(217,91,67)"]);
-
-        var projection = d3.geo.albersUsa()
-            .translate([width / 2, height / 2])
-            .scale([1000]);
-
-        var path = d3.geo.path()
-            .projection(projection);
-
-        var divTooltip;
-
-        var svg = d3.select(".map")
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .call(d3.behavior.zoom().on("zoom", function () {
-                svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
-            }))
-            .append("g");
-
         function loadMapFeatures(json) {
             svg.selectAll("path")
                 .data(json.features)
@@ -67,6 +48,7 @@
                 .style("fill", "#BBB0B0");
         }
 
+        //http://bl.ocks.org/michellechandra/0b2ce4923dc9b5809922
         function createTooltip(d) {
             divTooltip = d3.select("body")
                 .append("div")
@@ -221,6 +203,8 @@
                     }
                 })
                 .style("opacity", 0.3)
+
+                //Tooltip se pojavi kada mišem pređemo preko kružića na mapi
                 .on("mouseover", function (d) {
 
                     d3.select(this).transition()
@@ -230,10 +214,13 @@
 
                     createTooltip(d);
                 })
+
+                //Tooltip nestane kada miš maknemo sa kružića
                 .on("mouseout", function () {
                     d3.select(this).transition()
                         .duration(200)
                         .style("fill", function () {
+                            //https://stackoverflow.com/questions/25270896/get-class-of-selected-svg-element-in-d3
                             if (d3.select(this).attr("class") == "blackCircle") {
                                 return "rgb(0,0,0)";
                             }
@@ -248,12 +235,49 @@
                         .style("opacity", 0)
                         .remove();
                 })
+
+                //Kada kliknemo na kružić pojavljuju se dodatne informacije o nesreći sa desne strane mape
                 .on("click", function (d) {
-                    
+
                     createTextInfo(d);
                     createDonutGraph(d);
                 });
         }
+
+        
+        var width = 750;
+        var height = 500;
+        var totalDead = 0;
+        var innerRadius = 50;
+        var outerRadius = 80;
+        var donutHeight = 300;
+        var donutWidth = 500;
+        var firstClick = false;
+        var dead = 0;
+        var currentRadius = 0;
+
+        var color = d3.scale.linear()
+            .range(["rgb(213,222,217)", "rgb(69,173,168)", "rgb(84,36,55)", "rgb(217,91,67)"]);
+
+        var projection = d3.geo.albersUsa()
+            .translate([width / 2, height / 2])
+            .scale([1000]);
+
+        var path = d3.geo.path()
+            .projection(projection);
+
+        var divTooltip;
+
+        var svg = d3.select(".map")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+
+            //Mapa ima mogućnost pomicanja sa mišem i povećanja i smanjivanja mape kada miš "scroll-amo"
+            .call(d3.behavior.zoom().on("zoom", function () {
+                svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+            }))
+            .append("g");
 
         d3.json("us-states.json", function (json) {
 
